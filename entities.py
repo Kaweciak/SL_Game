@@ -1,5 +1,6 @@
 import pygame
 from enum import Enum
+import json
 
 class State(Enum):
     PLAYING = 1
@@ -7,11 +8,11 @@ class State(Enum):
     COMPLETE = 3
 
 class Player:
-    def __init__(self):
-        self.rect = pygame.Rect(100, 100, 50, 50)
+    def __init__(self, spawn_x=100, spawn_y=100):
+        self.rect = pygame.Rect(spawn_x, spawn_y, 50, 50)
         self.velocity = pygame.Vector2(0, 0)
         self.on_ground = False
-        self.spawn_point = pygame.Rect(100, 100, 50, 50)
+        self.spawn_point = pygame.Rect(spawn_x, spawn_y, 50, 50)
         self.state = State.PLAYING
 
     def set_spawn_point(self, x, y):
@@ -91,3 +92,54 @@ class FinishPoint:
 
     def render(self, screen):
         pygame.draw.rect(screen, (0, 255, 255), self.rect)
+
+class Level:
+    def __init__(self, start_point, finish_point, platforms, obstacles):
+        self.start_point = start_point
+        self.finish_point = finish_point
+        self.platforms = platforms
+        self.obstacles = obstacles
+
+    def to_dict(self):
+        return {
+            "start_point": (self.start_point[0], self.start_point[1]),
+            "finish_point": {
+                "x": self.finish_point.rect.x,
+                "y": self.finish_point.rect.y,
+                "width": self.finish_point.rect.width,
+                "height": self.finish_point.rect.height
+            },
+            "platforms": [
+                {
+                    "x": p.rect.x,
+                    "y": p.rect.y,
+                    "width": p.rect.width,
+                    "height": p.rect.height
+                } for p in self.platforms
+            ],
+            "obstacles": [
+                {
+                    "x": o.rect.x,
+                    "y": o.rect.y,
+                    "width": o.rect.width,
+                    "height": o.rect.height
+                } for o in self.obstacles
+            ]
+        }
+
+    @classmethod
+    def from_dict(cls, data):
+        start_point = data["start_point"]
+        finish_data = data["finish_point"]
+        finish_point = FinishPoint(finish_data["x"], finish_data["y"], finish_data["width"], finish_data["height"])
+        platforms = [Platform(p["x"], p["y"], p["width"], p["height"]) for p in data["platforms"]]
+        obstacles = [Obstacle(o["x"], o["y"], o["width"], o["height"]) for o in data["obstacles"]]
+        return cls(start_point, finish_point, platforms, obstacles)
+
+    def to_json(self):
+        return json.dumps(self.to_dict(), indent=4, sort_keys=True)
+
+    @classmethod
+    def from_json(cls, json_str):
+        data = json.loads(json_str)
+        return cls.from_dict(data)

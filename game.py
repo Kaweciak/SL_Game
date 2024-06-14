@@ -1,20 +1,43 @@
 import pygame
-from entities import Player, Platform, Obstacle, FinishPoint, State
+import os
+import json
+from entities import Player, Platform, Obstacle, FinishPoint, State, Level
 
 class Game:
-    def __init__(self, main_menu_callback):
+    def __init__(self, main_menu_callback, level_json=None):
         self.screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
         self.clock = pygame.time.Clock()
+        self.main_menu_callback = main_menu_callback
+
+        if level_json:
+            level = Level.from_json(level_json)
+            self.player = Player(level.start_point[0], level.start_point[1])
+            self.platforms = level.platforms
+            self.obstacles = level.obstacles
+            self.finish_point = level.finish_point
+        else:
+            self.create_default_level()
+
+        self.game_state = State.PLAYING
+
+    def create_default_level(self):
         self.player = Player()
         self.platforms = [Platform(100, 500, 200, 10), Platform(400, 400, 200, 10)]
         self.obstacles = [Obstacle(300, 300, 50, 50)]
         self.start_point = (100, 100)
         self.finish_point = FinishPoint(700, 500, 50, 50)
-        self.game_state = State.PLAYING
-        self.main_menu_callback = main_menu_callback
+        level = Level(self.start_point, self.finish_point, self.platforms, self.obstacles)
+        level_json = level.to_json()
+
+        # Ensure the levels directory exists
+        os.makedirs('levels', exist_ok=True)
+
+        # Save the level to a JSON file
+        with open('levels/level1.json', 'w') as file:
+            file.write(level_json)
 
     def reset_level(self):
-        self.player.set_spawn_point(*self.start_point)
+        self.player.set_spawn_point(self.player.spawn_point.x, self.player.spawn_point.y)
         self.player.respawn()
 
     def run(self):
@@ -97,4 +120,14 @@ class Game:
 
 if __name__ == '__main__':
     from MainMenu import main_menu
-    Game(main_menu).run()
+
+    # Check if level1.json exists and load it
+    level_path = 'levels/level1.json'
+    if os.path.exists(level_path):
+        with open(level_path, 'r') as file:
+            level_json = file.read()
+    else:
+        level_json = None
+
+    # Start the game with the loaded or default level
+    Game(main_menu, level_json).run()
