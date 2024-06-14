@@ -27,14 +27,6 @@ class Game:
         self.start_point = (100, 100)
         self.finish_point = FinishPoint(700, 500, 50, 50)
         level = Level(self.start_point, self.finish_point, self.platforms, self.obstacles)
-        level_json = level.to_json()
-
-        # Ensure the levels directory exists
-        os.makedirs('levels', exist_ok=True)
-
-        # Save the level to a JSON file
-        with open('levels/level1.json', 'w') as file:
-            file.write(level_json)
 
     def reset_level(self):
         self.player.set_spawn_point(self.player.spawn_point.x, self.player.spawn_point.y)

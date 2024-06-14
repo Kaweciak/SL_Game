@@ -1,21 +1,19 @@
 import pygame
 import sys
-import game
+import LevelSelector
+from constants import *
 
 pygame.init()
 
-WHITE = (255, 255, 255)
-BLACK = (0, 0, 0)
-GRAY = (200, 200, 200)
-HIGHLIGHT_GRAY = (170, 170, 170)
-WIDTH, HEIGHT = pygame.display.Info().current_w, pygame.display.Info().current_h
-BUTTON_WIDTH, BUTTON_HEIGHT = 400, 100
+# Screen dimensions must be initialized after video
+WIDTH = pygame.display.Info().current_w
+HEIGHT = pygame.display.Info().current_h
 
 screen = pygame.display.set_mode((WIDTH, HEIGHT), pygame.FULLSCREEN)
 pygame.display.set_caption("Main Menu")
 
-font = pygame.font.Font(None, 74)
-button_font = pygame.font.Font(None, 50)
+font = pygame.font.Font(None, FONT_SIZE)
+button_font = pygame.font.Font(None, BUTTON_FONT_SIZE)
 
 def draw_button(screen, text, rect, is_hovered):
     color = HIGHLIGHT_GRAY if is_hovered else GRAY
@@ -23,7 +21,6 @@ def draw_button(screen, text, rect, is_hovered):
     label = button_font.render(text, True, BLACK)
     screen.blit(label, (rect.x + (rect.width - label.get_width()) // 2,
                         rect.y + (rect.height - label.get_height()) // 2))
-
 
 def main_menu():
     clock = pygame.time.Clock()
@@ -47,7 +44,7 @@ def main_menu():
                 sys.exit()
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if play_button.collidepoint(event.pos):
-                    game.Game(main_menu).run()
+                    LevelSelector.level_selector(main_menu)
                 elif editor_button.collidepoint(event.pos):
                     print("Level Editor button pressed")
                 elif quit_button.collidepoint(event.pos):

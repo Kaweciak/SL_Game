@@ -128,18 +128,18 @@ class Level:
         }
 
     @classmethod
-    def from_dict(cls, data):
+    def from_dict(self, data):
         start_point = data["start_point"]
         finish_data = data["finish_point"]
         finish_point = FinishPoint(finish_data["x"], finish_data["y"], finish_data["width"], finish_data["height"])
         platforms = [Platform(p["x"], p["y"], p["width"], p["height"]) for p in data["platforms"]]
         obstacles = [Obstacle(o["x"], o["y"], o["width"], o["height"]) for o in data["obstacles"]]
-        return cls(start_point, finish_point, platforms, obstacles)
+        return self(start_point, finish_point, platforms, obstacles)
 
     def to_json(self):
         return json.dumps(self.to_dict(), indent=4, sort_keys=True)
 
     @classmethod
-    def from_json(cls, json_str):
+    def from_json(self, json_str):
         data = json.loads(json_str)
-        return cls.from_dict(data)
+        return self.from_dict(data)

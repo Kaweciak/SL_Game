@@ -21,8 +21,10 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="constants.py" />
     <Compile Include="entities.py" />
     <Compile Include="game.py" />
+    <Compile Include="LevelSelector.py" />
     <Compile Include="MainMenu.py" />
   </ItemGroup>
   <ItemGroup>
