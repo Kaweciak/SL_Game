@@ -44,9 +44,9 @@ class Game:
                 self.update()
                 self.render()
             elif self.game_state == State.DEAD:
-                self.show_message("You died!", ["Retry", "Quit"], self.handle_death_choice)
+                self.show_message("You died!", ["Retry", "Quit"], self.handle_replay_choice)
             elif self.game_state == State.COMPLETE:
-                self.show_message("Level Complete!", ["Retry", "Quit"], self.handle_complete_choice)
+                self.show_message("Level Complete!", ["Retry", "Quit"], self.handle_replay_choice)
             
             self.clock.tick(60)
 
@@ -96,24 +96,16 @@ class Game:
                             callback(i)
                             choosing = False
 
-    def handle_death_choice(self, choice):
-        if choice == 0:  # Retry
+    def handle_replay_choice(self, choice):
+        if choice == 0:
             self.reset_level()
             self.game_state = State.PLAYING
-        elif choice == 1:  # Quit
-            self.main_menu_callback()
-
-    def handle_complete_choice(self, choice):
-        if choice == 0:  # Retry
-            self.reset_level()
-            self.game_state = State.PLAYING
-        elif choice == 1:  # Quit
+        elif choice == 1:
             self.main_menu_callback()
 
 if __name__ == '__main__':
     from MainMenu import main_menu
 
-    # Check if level1.json exists and load it
     level_path = 'levels/level1.json'
     if os.path.exists(level_path):
         with open(level_path, 'r') as file:
@@ -121,5 +113,4 @@ if __name__ == '__main__':
     else:
         level_json = None
 
-    # Start the game with the loaded or default level
     Game(main_menu, level_json).run()

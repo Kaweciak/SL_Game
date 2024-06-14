@@ -6,7 +6,6 @@ from constants import *
 
 pygame.init()
 
-# Screen dimensions must be initialized after video
 WIDTH = pygame.display.Info().current_w
 HEIGHT = pygame.display.Info().current_h
 

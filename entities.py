@@ -36,7 +36,7 @@ class Player:
 
     def apply_gravity(self):
         if not self.on_ground:
-            self.velocity.y += 0.5  # Gravity
+            self.velocity.y += 0.5
         else:
             self.velocity.y = 0
 
