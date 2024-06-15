@@ -12,15 +12,6 @@ HEIGHT = pygame.display.Info().current_h
 screen = pygame.display.set_mode((WIDTH, HEIGHT), pygame.FULLSCREEN)
 pygame.display.set_caption("Main Menu")
 
-font = pygame.font.Font(None, FONT_SIZE)
-button_font = pygame.font.Font(None, BUTTON_FONT_SIZE)
-
-def draw_button(screen, text, rect, is_hovered):
-    color = HIGHLIGHT_GRAY if is_hovered else GRAY
-    pygame.draw.rect(screen, color, rect)
-    label = button_font.render(text, True, BLACK)
-    screen.blit(label, (rect.x + (rect.width - label.get_width()) // 2,
-                        rect.y + (rect.height - label.get_height()) // 2))
 
 def main_menu():
     clock = pygame.time.Clock()

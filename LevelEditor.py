@@ -2,7 +2,7 @@ import pygame
 import pygame_gui
 import json
 import os
-from entities import Platform, Obstacle, FinishPoint, StartPoint, Level
+from entities import *
 from constants import *
 
 class LevelEditor:
@@ -32,21 +32,18 @@ class LevelEditor:
         self.hotbar_rects = []
         self.setup_hotbar()
 
+        screen_width, screen_height = self.screen.get_size()
+        self.save_button_rect = pygame.Rect((screen_width - 260, screen_height - 60), (250, 50))
+        self.quit_button_rect = pygame.Rect((screen_width - 630, screen_height - 60), (350, 50))
+        self.is_save_button_hovered = False
+        self.is_quit_button_hovered = False
+
     def setup_ui(self):
         screen_width, screen_height = self.screen.get_size()
         self.text_entry = pygame_gui.elements.UITextEntryLine(
-            relative_rect=pygame.Rect((screen_width - 210, screen_height - 80), (200, 30)),
+            relative_rect=pygame.Rect((screen_width - 260, screen_height - 100), (250, 50)),
             manager=self.manager
         )
-        self.save_button = pygame_gui.elements.UIButton(
-            relative_rect=pygame.Rect((screen_width - 210, screen_height - 40), (BUTTON_WIDTH, BUTTON_HEIGHT)),
-            text='Save and Quit',
-            manager=self.manager,
-            object_id='#save_button'
-        )
-        self.save_button.background_colour = GRAY
-        self.save_button.text_color = BLACK
-        self.save_button.font = pygame.font.Font(None, BUTTON_FONT_SIZE)
 
     def setup_hotbar(self):
         screen_height = self.screen.get_height()
@@ -75,9 +72,14 @@ class LevelEditor:
                 self.handle_mouse_motion(event)
             self.manager.process_events(event)
 
-            if event.type == pygame_gui.UI_BUTTON_PRESSED:
-                if event.ui_element == self.save_button:
+            mouse_pos = pygame.mouse.get_pos()
+            self.is_save_button_hovered = self.save_button_rect.collidepoint(mouse_pos)
+            self.is_quit_button_hovered = self.quit_button_rect.collidepoint(mouse_pos)
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                if self.is_save_button_hovered:
                     self.save_and_quit()
+                elif self.is_quit_button_hovered:
+                    self.quit_without_saving()
 
     def handle_mouse_button_down(self, event):
         if event.button == 1:
@@ -107,7 +109,7 @@ class LevelEditor:
             for obj in self.level.platforms + self.level.obstacles + self.level.finish_points + [self.level.start_point]:
                 if obj.rect.collidepoint(event.pos):
                     self.selected_object = obj
-                    if self.is_near_edge(event.pos, obj.rect):
+                    if not isinstance(obj, StartPoint) and self.is_near_edge(event.pos, obj.rect):
                         self.resizing = True
                     else:
                         self.dragging = True
@@ -123,7 +125,7 @@ class LevelEditor:
         if self.dragging and self.selected_object:
             self.selected_object.rect.x += event.rel[0]
             self.selected_object.rect.y += event.rel[1]
-        elif self.resizing and self.selected_object:
+        elif self.resizing and self.selected_object and not isinstance(self.selected_object, StartPoint):
             self.selected_object.rect.width += event.rel[0]
             self.selected_object.rect.height += event.rel[1]
 
@@ -146,6 +148,8 @@ class LevelEditor:
         self.level.start_point.render(self.screen)
         self.render_hotbar()
         self.manager.draw_ui(self.screen)
+        draw_button(self.screen, 'Save and Quit', self.save_button_rect, self.is_save_button_hovered)
+        draw_button(self.screen, 'Quit Without Saving', self.quit_button_rect, self.is_quit_button_hovered)
         pygame.display.flip()
 
     def render_hotbar(self):
@@ -163,7 +167,9 @@ class LevelEditor:
     def save_and_quit(self):
         level_name = self.text_entry.get_text().strip()
         if not level_name:
-            level_name = 'level'
+            self.show_error_message("Please enter a name for the level before saving.")
+            return
+
         level_dict = self.level.to_dict()
         levels_dir = 'Levels'
         os.makedirs(levels_dir, exist_ok=True)
@@ -178,6 +184,26 @@ class LevelEditor:
         file_path = os.path.join(levels_dir, f'{level_name}.json')
         with open(file_path, 'w') as file:
             json.dump(level_dict, file, indent=4)
+
+        # Create a surface for the level layout
+        layout_surface = pygame.Surface(self.screen.get_size())
+        layout_surface.fill(WHITE)
+
+        for platform in self.level.platforms:
+            platform.render(layout_surface)
+        for obstacle in self.level.obstacles:
+            obstacle.render(layout_surface)
+        for finish_point in self.level.finish_points:
+            finish_point.render(layout_surface)
+        self.level.start_point.render(layout_surface)
+
+        # Save the layout surface as an image
+        screenshot_path = os.path.join(levels_dir, f'{level_name}.png')
+        pygame.image.save(layout_surface, screenshot_path)
+
+        self.main_menu_callback()
+
+    def quit_without_saving(self):
         self.main_menu_callback()
 
     def show_error_message(self, message):
@@ -186,3 +212,4 @@ class LevelEditor:
             html_message=message,
             manager=self.manager
         )
+
