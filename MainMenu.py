@@ -2,10 +2,10 @@ import pygame
 import sys
 import LevelSelector
 from constants import *
+from LevelEditor import LevelEditor
 
 pygame.init()
 
-# Screen dimensions must be initialized after video
 WIDTH = pygame.display.Info().current_w
 HEIGHT = pygame.display.Info().current_h
 
@@ -46,7 +46,7 @@ def main_menu():
                 if play_button.collidepoint(event.pos):
                     LevelSelector.level_selector(main_menu)
                 elif editor_button.collidepoint(event.pos):
-                    print("Level Editor button pressed")
+                    LevelEditor(main_menu).run()
                 elif quit_button.collidepoint(event.pos):
                     pygame.quit()
                     sys.exit()

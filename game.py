@@ -1,7 +1,6 @@
 import pygame
-import os
 import json
-from entities import Player, Platform, Obstacle, FinishPoint, State, Level
+from entities import *
 
 class Game:
     def __init__(self, main_menu_callback, level_json=None):
@@ -11,22 +10,22 @@ class Game:
 
         if level_json:
             level = Level.from_json(level_json)
-            self.player = Player(level.start_point[0], level.start_point[1])
+            self.player = Player(level.start_point.rect.x, level.start_point.rect.y)
             self.platforms = level.platforms
             self.obstacles = level.obstacles
-            self.finish_point = level.finish_point
+            self.finish_points = level.finish_points
         else:
             self.create_default_level()
 
         self.game_state = State.PLAYING
 
     def create_default_level(self):
-        self.player = Player()
+        start_point = StartPoint(100, 100)
+        self.player = Player(start_point.rect.x, start_point.rect.y)
         self.platforms = [Platform(100, 500, 200, 10), Platform(400, 400, 200, 10)]
         self.obstacles = [Obstacle(300, 300, 50, 50)]
-        self.start_point = (100, 100)
-        self.finish_point = FinishPoint(700, 500, 50, 50)
-        level = Level(self.start_point, self.finish_point, self.platforms, self.obstacles)
+        self.finish_points = [FinishPoint(700, 500, 50, 50)]
+        self.level = Level(start_point, self.finish_points, self.platforms, self.obstacles)
 
     def reset_level(self):
         self.player.set_spawn_point(self.player.spawn_point.x, self.player.spawn_point.y)
@@ -52,8 +51,10 @@ class Game:
 
     def update(self):
         self.game_state = self.player.update(self.platforms, self.obstacles)
-        if self.player.rect.colliderect(self.finish_point.rect):
-            self.game_state = State.COMPLETE
+        for finish_point in self.finish_points:
+            if self.player.rect.colliderect(finish_point.rect):
+                self.game_state = State.COMPLETE
+                break
 
     def render(self):
         self.screen.fill((255, 255, 255))
@@ -61,7 +62,8 @@ class Game:
             platform.render(self.screen)
         for obstacle in self.obstacles:
             obstacle.render(self.screen)
-        self.finish_point.render(self.screen)
+        for finish_point in self.finish_points:
+            finish_point.render(self.screen)
         self.player.render(self.screen)
         pygame.display.flip()
 
@@ -102,15 +104,3 @@ class Game:
             self.game_state = State.PLAYING
         elif choice == 1:
             self.main_menu_callback()
-
-if __name__ == '__main__':
-    from MainMenu import main_menu
-
-    level_path = 'levels/level1.json'
-    if os.path.exists(level_path):
-        with open(level_path, 'r') as file:
-            level_json = file.read()
-    else:
-        level_json = None
-
-    Game(main_menu, level_json).run()

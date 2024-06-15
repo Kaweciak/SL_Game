@@ -93,22 +93,31 @@ class FinishPoint:
     def render(self, screen):
         pygame.draw.rect(screen, (0, 255, 255), self.rect)
 
+class StartPoint:
+    def __init__(self, x, y):
+        self.rect = pygame.Rect(x, y, 10, 10)  # Small rectangle to represent the start point
+
+    def render(self, screen):
+        pygame.draw.rect(screen, (0, 0, 0), self.rect)  # Black color for start point
+
 class Level:
-    def __init__(self, start_point, finish_point, platforms, obstacles):
+    def __init__(self, start_point, finish_points, platforms, obstacles):
         self.start_point = start_point
-        self.finish_point = finish_point
+        self.finish_points = finish_points
         self.platforms = platforms
         self.obstacles = obstacles
 
     def to_dict(self):
         return {
-            "start_point": (self.start_point[0], self.start_point[1]),
-            "finish_point": {
-                "x": self.finish_point.rect.x,
-                "y": self.finish_point.rect.y,
-                "width": self.finish_point.rect.width,
-                "height": self.finish_point.rect.height
-            },
+            "start_point": (self.start_point.rect.x, self.start_point.rect.y),
+            "finish_points": [
+                {
+                    "x": f.rect.x,
+                    "y": f.rect.y,
+                    "width": f.rect.width,
+                    "height": f.rect.height
+                } for f in self.finish_points
+            ],
             "platforms": [
                 {
                     "x": p.rect.x,
@@ -129,12 +138,13 @@ class Level:
 
     @classmethod
     def from_dict(self, data):
-        start_point = data["start_point"]
-        finish_data = data["finish_point"]
-        finish_point = FinishPoint(finish_data["x"], finish_data["y"], finish_data["width"], finish_data["height"])
+        start_point_data = data["start_point"]
+        start_point = StartPoint(start_point_data[0], start_point_data[1])
+        finish_points_data = data["finish_points"]
+        finish_points = [FinishPoint(f["x"], f["y"], f["width"], f["height"]) for f in finish_points_data]
         platforms = [Platform(p["x"], p["y"], p["width"], p["height"]) for p in data["platforms"]]
         obstacles = [Obstacle(o["x"], o["y"], o["width"], o["height"]) for o in data["obstacles"]]
-        return self(start_point, finish_point, platforms, obstacles)
+        return self(start_point, finish_points, platforms, obstacles)
 
     def to_json(self):
         return json.dumps(self.to_dict(), indent=4, sort_keys=True)
