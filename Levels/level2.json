@@ -1,0 +1,34 @@
+{
+    "finish_point": {
+        "height": 50,
+        "width": 50,
+        "x": 700,
+        "y": 500
+    },
+    "obstacles": [
+        {
+            "height": 50,
+            "width": 50,
+            "x": 300,
+            "y": 300
+        }
+    ],
+    "platforms": [
+        {
+            "height": 10,
+            "width": 200,
+            "x": 100,
+            "y": 500
+        },
+        {
+            "height": 10,
+            "width": 200,
+            "x": 400,
+            "y": 400
+        }
+    ],
+    "start_point": [
+        100,
+        100
+    ]
+}

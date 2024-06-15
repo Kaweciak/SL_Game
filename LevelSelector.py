@@ -37,26 +37,40 @@ def level_selector(main_menu_callback):
     back_button = pygame.Rect(50, HEIGHT - BUTTON_HEIGHT - 50, BUTTON_WIDTH, BUTTON_HEIGHT)
     level_buttons = []
 
+    x_offset = 0
+    y = (HEIGHT - LEVEL_BUTTON_HEIGHT) // 2
+
     for idx, (level_name, image_path) in enumerate(levels):
-        x = (WIDTH - LEVEL_BUTTON_WIDTH) // 2
-        y = (HEIGHT // 3) + idx * (LEVEL_BUTTON_HEIGHT + 20)
+        x = x_offset + idx * (LEVEL_BUTTON_WIDTH + 20)
         rect = pygame.Rect(x, y, LEVEL_BUTTON_WIDTH, LEVEL_BUTTON_HEIGHT)
         level_buttons.append((rect, level_name, image_path))
+
+    scroll_x = 0
+    max_scroll_x = max(0, (LEVEL_BUTTON_WIDTH + 20) * len(levels) - WIDTH)
 
     while True:
         screen.fill(WHITE)
 
         mouse_pos = pygame.mouse.get_pos()
-        
+
         for rect, level_name, image_path in level_buttons:
-            is_hovered = rect.collidepoint(mouse_pos)
-            draw_button(screen, level_name, rect, is_hovered)
+            scrolled_rect = rect.move(-scroll_x, 0)
+            is_hovered = scrolled_rect.collidepoint(mouse_pos)
+            draw_button(screen, level_name, scrolled_rect, is_hovered)
             level_image = pygame.image.load(image_path)
             level_image = pygame.transform.scale(level_image, LEVEL_IMAGE_SIZE)
-            screen.blit(level_image, (rect.x, rect.y - LEVEL_IMAGE_SIZE[1] - 10))
+            screen.blit(level_image, (scrolled_rect.x, scrolled_rect.y - LEVEL_IMAGE_SIZE[1] - 10))
 
         draw_button(screen, "Back", back_button, back_button.collidepoint(mouse_pos))
-        
+
+        pygame.draw.rect(screen, GRAY, (0, HEIGHT - 50, WIDTH, 50))
+        scrollbar_rect = pygame.Rect(50, HEIGHT - 40, WIDTH - 100, 30)
+        handle_width = max(30, scrollbar_rect.width * (WIDTH / (max_scroll_x + WIDTH)))
+        handle_rect = pygame.Rect(scrollbar_rect.x + (scrollbar_rect.width - handle_width) * (scroll_x / max_scroll_x),
+                                  scrollbar_rect.y, handle_width, scrollbar_rect.height)
+        pygame.draw.rect(screen, DARK_GRAY, scrollbar_rect)
+        pygame.draw.rect(screen, LIGHT_GRAY, handle_rect)
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -65,12 +79,23 @@ def level_selector(main_menu_callback):
                 if back_button.collidepoint(event.pos):
                     main_menu_callback()
                     return
+                if handle_rect.collidepoint(event.pos):
+                    dragging = True
+                    drag_start_x = event.pos[0]
+                    start_scroll_x = scroll_x
                 for rect, level_name, image_path in level_buttons:
-                    if rect.collidepoint(event.pos):
+                    if rect.move(-scroll_x, 0).collidepoint(event.pos):
                         level_path = os.path.join(level_directory, f'{level_name}.json')
                         with open(level_path, 'r') as file:
                             level_json = file.read()
                         game.Game(main_menu_callback, level_json).run()
-        
+            elif event.type == pygame.MOUSEBUTTONUP:
+                dragging = False
+            elif event.type == pygame.MOUSEMOTION:
+                if dragging:
+                    delta_x = event.pos[0] - drag_start_x
+                    scroll_x = start_scroll_x + (delta_x / scrollbar_rect.width) * max_scroll_x
+                    scroll_x = max(0, min(scroll_x, max_scroll_x))
+
         pygame.display.flip()
         clock.tick(60)
