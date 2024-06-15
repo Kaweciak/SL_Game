@@ -1,8 +1,8 @@
 import pygame
 import sys
-import LevelSelector
+import level_selector
 from constants import *
-from LevelEditor import LevelEditor
+from level_editor import LevelEditor
 
 pygame.init()
 
@@ -21,7 +21,7 @@ def main_menu():
     quit_button = pygame.Rect((WIDTH - BUTTON_WIDTH) // 2, HEIGHT * 2 // 3, BUTTON_WIDTH, BUTTON_HEIGHT)
     
     while True:
-        screen.fill(WHITE)
+        screen.fill(GRAY)
         
         mouse_pos = pygame.mouse.get_pos()
         
@@ -35,7 +35,7 @@ def main_menu():
                 sys.exit()
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if play_button.collidepoint(event.pos):
-                    LevelSelector.level_selector(main_menu)
+                    level_selector.level_selector(main_menu)
                 elif editor_button.collidepoint(event.pos):
                     LevelEditor(main_menu).run()
                 elif quit_button.collidepoint(event.pos):

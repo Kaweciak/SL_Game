@@ -55,24 +55,22 @@ class Player:
     def handle_collisions(self, platforms, obstacles):
         self.on_ground = False
 
-        # Vertical movement
         self.rect.y += self.velocity.y
         for platform in platforms:
             if self.rect.colliderect(platform.rect):
-                if self.velocity.y > 0:  # Falling
+                if self.velocity.y > 0:
                     self.rect.bottom = platform.rect.top
                     self.on_ground = True
-                elif self.velocity.y < 0:  # Jumping up
+                elif self.velocity.y < 0:
                     self.rect.top = platform.rect.bottom
                 self.velocity.y = 0
 
-        # Horizontal movement
         self.rect.x += self.velocity.x
         for platform in platforms:
             if self.rect.colliderect(platform.rect):
-                if self.velocity.x > 0:  # Moving right
+                if self.velocity.x > 0: 
                     self.rect.right = platform.rect.left
-                elif self.velocity.x < 0:  # Moving left
+                elif self.velocity.x < 0: 
                     self.rect.left = platform.rect.right
                 self.velocity.x = 0
 

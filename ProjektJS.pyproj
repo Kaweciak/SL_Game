@@ -4,7 +4,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>b32ec243-3940-4bba-816f-cd93082bd476</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>MainMenu.py</StartupFile>
+    <StartupFile>main_menu.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -24,9 +24,9 @@
     <Compile Include="constants.py" />
     <Compile Include="entities.py" />
     <Compile Include="game.py" />
-    <Compile Include="LevelEditor.py" />
-    <Compile Include="LevelSelector.py" />
-    <Compile Include="MainMenu.py" />
+    <Compile Include="level_editor.py" />
+    <Compile Include="level_selector.py" />
+    <Compile Include="main_menu.py" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Levels\" />

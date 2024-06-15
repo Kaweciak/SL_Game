@@ -1,0 +1,36 @@
+{
+    "start_point": [
+        135,
+        119
+    ],
+    "finish_points": [
+        {
+            "x": 626,
+            "y": 208,
+            "width": 50,
+            "height": 50
+        }
+    ],
+    "platforms": [
+        {
+            "x": 94,
+            "y": 223,
+            "width": 262,
+            "height": 39
+        },
+        {
+            "x": 463,
+            "y": 219,
+            "width": 138,
+            "height": 29
+        }
+    ],
+    "obstacles": [
+        {
+            "x": 375,
+            "y": 123,
+            "width": 66,
+            "height": 157
+        }
+    ]
+}

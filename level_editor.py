@@ -31,6 +31,8 @@ class LevelEditor:
             StartPoint(0, 0)
         ]
         self.hotbar_rects = []
+        self.hotbar_labels = ["Platform", "Obstacle", "Finish", "Start"]
+        self.font = pygame.font.SysFont('Arial', 24)
         self.setup_hotbar()
 
         screen_width, screen_height = self.screen.get_size()
@@ -204,7 +206,7 @@ class LevelEditor:
         pygame.mouse.set_cursor(self.cursors[cursor_type])
 
     def render(self):
-        self.screen.fill(WHITE)
+        self.screen.fill(GRAY)
         for platform in self.level.platforms:
             platform.render(self.screen)
         for obstacle in self.level.obstacles:
@@ -230,6 +232,11 @@ class LevelEditor:
             elif isinstance(self.hotbar_objects[i], StartPoint):
                 pygame.draw.rect(self.screen, (0, 0, 0), rect.inflate(-10, -10))
 
+            label_text = self.hotbar_labels[i]
+            label_surface = self.font.render(label_text, True, (255, 255, 255))
+            label_rect = label_surface.get_rect(center=(rect.centerx, rect.top - 20))
+            self.screen.blit(label_surface, label_rect)
+
     def save_and_quit(self):
         level_name = self.text_entry.get_text().strip()
         if not level_name:
@@ -252,7 +259,7 @@ class LevelEditor:
             json.dump(level_dict, file, indent=4)
 
         layout_surface = pygame.Surface(self.screen.get_size())
-        layout_surface.fill(WHITE)
+        layout_surface.fill(GRAY)
 
         for platform in self.level.platforms:
             platform.render(layout_surface)

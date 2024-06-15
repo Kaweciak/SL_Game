@@ -1,4 +1,5 @@
 import pygame
+from constants import GRAY
 from entities import *
 
 class Game:
@@ -42,9 +43,9 @@ class Game:
                 self.update()
                 self.render()
             elif self.game_state == State.DEAD:
-                self.show_message("You died!", ["Retry", "Quit"], self.handle_replay_choice)
+                self.show_message("You died!", ["Try again", "Quit"], self.handle_replay_choice)
             elif self.game_state == State.COMPLETE:
-                self.show_message("Level Complete!", ["Retry", "Quit"], self.handle_replay_choice)
+                self.show_message("Level Complete!", ["Try again", "Quit"], self.handle_replay_choice)
             
             self.clock.tick(60)
 
@@ -56,7 +57,7 @@ class Game:
                 break
 
     def render(self):
-        self.screen.fill((255, 255, 255))
+        self.screen.fill(GRAY)
         for platform in self.platforms:
             platform.render(self.screen)
         for obstacle in self.obstacles:
@@ -71,7 +72,7 @@ class Game:
         text = font.render(message, True, (0, 0, 0))
         text_rect = text.get_rect(center=(self.screen.get_width() // 2, self.screen.get_height() // 2 - 50))
 
-        self.screen.fill((255, 255, 255))
+        self.screen.fill(GRAY)
         self.screen.blit(text, text_rect)
 
         button_font = pygame.font.Font(None, 50)

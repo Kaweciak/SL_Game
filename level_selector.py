@@ -16,7 +16,7 @@ font = pygame.font.Font(None, FONT_SIZE)
 button_font = pygame.font.Font(None, BUTTON_FONT_SIZE)
 
 def draw_button(screen, text, rect, is_hovered):
-    color = HIGHLIGHT_GRAY if is_hovered else GRAY
+    color = LIGHT_GRAY if is_hovered else DARK_GRAY
     pygame.draw.rect(screen, color, rect)
     lines = split_text_to_fit_height(button_font, text, rect.width, rect.height)
     for i, line in enumerate(lines):
@@ -72,7 +72,7 @@ def level_selector(main_menu_callback):
     dragging = False
 
     while True:
-        screen.fill(WHITE)
+        screen.fill(GRAY)
 
         mouse_pos = pygame.mouse.get_pos()
 
