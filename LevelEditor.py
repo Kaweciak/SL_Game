@@ -14,6 +14,7 @@ class LevelEditor:
         self.selected_object = None
         self.dragging = False
         self.resizing = False
+        self.resize_edge = None
 
         self.manager = pygame_gui.UIManager(self.screen.get_size())
         self.setup_ui()
@@ -37,6 +38,19 @@ class LevelEditor:
         self.quit_button_rect = pygame.Rect((screen_width - 630, screen_height - 60), (350, 50))
         self.is_save_button_hovered = False
         self.is_quit_button_hovered = False
+
+        # Load custom cursors
+        self.cursors = {
+            'default': pygame.SYSTEM_CURSOR_ARROW,
+            'left': pygame.SYSTEM_CURSOR_SIZEWE,
+            'right': pygame.SYSTEM_CURSOR_SIZEWE,
+            'top': pygame.SYSTEM_CURSOR_SIZENS,
+            'bottom': pygame.SYSTEM_CURSOR_SIZENS,
+            'top-left': pygame.SYSTEM_CURSOR_SIZENWSE,
+            'top-right': pygame.SYSTEM_CURSOR_SIZENESW,
+            'bottom-left': pygame.SYSTEM_CURSOR_SIZENESW,
+            'bottom-right': pygame.SYSTEM_CURSOR_SIZENWSE
+        }
 
     def setup_ui(self):
         screen_width, screen_height = self.screen.get_size()
@@ -109,33 +123,86 @@ class LevelEditor:
             for obj in self.level.platforms + self.level.obstacles + self.level.finish_points + [self.level.start_point]:
                 if obj.rect.collidepoint(event.pos):
                     self.selected_object = obj
-                    if not isinstance(obj, StartPoint) and self.is_near_edge(event.pos, obj.rect):
+                    self.resize_edge = self.get_resize_edge(event.pos, obj.rect)
+                    if self.resize_edge:
                         self.resizing = True
                     else:
                         self.dragging = True
+                    return
+        elif event.button == 3:
+            for obj in self.level.platforms + self.level.obstacles + self.level.finish_points:
+                if obj.rect.collidepoint(event.pos):
+                    if isinstance(obj, Platform):
+                        self.level.platforms.remove(obj)
+                    elif isinstance(obj, Obstacle):
+                        self.level.obstacles.remove(obj)
+                    elif isinstance(obj, FinishPoint):
+                        self.level.finish_points.remove(obj)
                     return
 
     def handle_mouse_button_up(self, event):
         if event.button == 1:
             self.dragging = False
             self.resizing = False
+            self.resize_edge = None
             self.selected_object = None
 
     def handle_mouse_motion(self, event):
         if self.dragging and self.selected_object:
             self.selected_object.rect.x += event.rel[0]
             self.selected_object.rect.y += event.rel[1]
-        elif self.resizing and self.selected_object and not isinstance(self.selected_object, StartPoint):
-            self.selected_object.rect.width += event.rel[0]
-            self.selected_object.rect.height += event.rel[1]
+        elif self.resizing and self.selected_object:
+            rect = self.selected_object.rect
+            if 'left' in self.resize_edge:
+                rect.width -= event.rel[0]
+                rect.x += event.rel[0]
+            if 'right' in self.resize_edge:
+                rect.width += event.rel[0]
+            if 'top' in self.resize_edge:
+                rect.height -= event.rel[1]
+                rect.y += event.rel[1]
+            if 'bottom' in self.resize_edge:
+                rect.height += event.rel[1]
+        else:
+            self.update_cursor(event.pos)
 
-    def is_near_edge(self, pos, rect):
+    def get_resize_edge(self, pos, rect):
         edge_margin = 10
-        near_left = rect.x <= pos[0] <= rect.x + edge_margin
-        near_right = rect.right - edge_margin <= pos[0] <= rect.right
-        near_top = rect.y <= pos[1] <= rect.y + edge_margin
-        near_bottom = rect.bottom - edge_margin <= pos[1] <= rect.bottom
-        return near_left or near_right or near_top or near_bottom
+        edges = []
+        if rect.x <= pos[0] <= rect.x + edge_margin:
+            edges.append('left')
+        if rect.right - edge_margin <= pos[0] <= rect.right:
+            edges.append('right')
+        if rect.y <= pos[1] <= rect.y + edge_margin:
+            edges.append('top')
+        if rect.bottom - edge_margin <= pos[1] <= rect.bottom:
+            edges.append('bottom')
+        return edges if edges else None
+
+    def update_cursor(self, pos):
+        cursor_type = 'default'
+        for obj in self.level.platforms + self.level.obstacles + self.level.finish_points + [self.level.start_point]:
+            if obj.rect.collidepoint(pos):
+                edges = self.get_resize_edge(pos, obj.rect)
+                if edges:
+                    if 'left' in edges and 'top' in edges:
+                        cursor_type = 'top-left'
+                    elif 'right' in edges and 'top' in edges:
+                        cursor_type = 'top-right'
+                    elif 'left' in edges and 'bottom' in edges:
+                        cursor_type = 'bottom-left'
+                    elif 'right' in edges and 'bottom' in edges:
+                        cursor_type = 'bottom-right'
+                    elif 'left' in edges:
+                        cursor_type = 'left'
+                    elif 'right' in edges:
+                        cursor_type = 'right'
+                    elif 'top' in edges:
+                        cursor_type = 'top'
+                    elif 'bottom' in edges:
+                        cursor_type = 'bottom'
+                    break
+        pygame.mouse.set_cursor(self.cursors[cursor_type])
 
     def render(self):
         self.screen.fill(WHITE)
@@ -185,7 +252,6 @@ class LevelEditor:
         with open(file_path, 'w') as file:
             json.dump(level_dict, file, indent=4)
 
-        # Create a surface for the level layout
         layout_surface = pygame.Surface(self.screen.get_size())
         layout_surface.fill(WHITE)
 
@@ -197,7 +263,6 @@ class LevelEditor:
             finish_point.render(layout_surface)
         self.level.start_point.render(layout_surface)
 
-        # Save the layout surface as an image
         screenshot_path = os.path.join(levels_dir, f'{level_name}.png')
         pygame.image.save(layout_surface, screenshot_path)
 
@@ -212,4 +277,3 @@ class LevelEditor:
             html_message=message,
             manager=self.manager
         )
-

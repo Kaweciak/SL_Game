@@ -26,7 +26,7 @@ def main_menu():
         mouse_pos = pygame.mouse.get_pos()
         
         draw_button(screen, "Play", play_button, play_button.collidepoint(mouse_pos))
-        draw_button(screen, "Level Editor", editor_button, editor_button.collidepoint(mouse_pos))
+        draw_button(screen, "Level Creator", editor_button, editor_button.collidepoint(mouse_pos))
         draw_button(screen, "Quit", quit_button, quit_button.collidepoint(mouse_pos))
         
         for event in pygame.event.get():
