@@ -18,9 +18,31 @@ button_font = pygame.font.Font(None, BUTTON_FONT_SIZE)
 def draw_button(screen, text, rect, is_hovered):
     color = HIGHLIGHT_GRAY if is_hovered else GRAY
     pygame.draw.rect(screen, color, rect)
-    label = button_font.render(text, True, BLACK)
-    screen.blit(label, (rect.x + (rect.width - label.get_width()) // 2,
-                        rect.y + (rect.height - label.get_height()) // 2))
+    lines = split_text_to_fit_height(button_font, text, rect.width, rect.height)
+    for i, line in enumerate(lines):
+        label = button_font.render(line, True, BLACK)
+        screen.blit(label, (rect.x + (rect.width - label.get_width()) // 2,
+                            rect.y + (i * button_font.get_height()) + (rect.height - len(lines) * button_font.get_height()) // 2))
+
+def split_text_to_fit_height(font, text, max_width, max_height):
+    words = text.split(' ')
+    lines = []
+    current_line = []
+
+    for word in words:
+        current_line.append(word)
+        if font.size(' '.join(current_line))[0] > max_width:
+            current_line.pop()
+            lines.append(' '.join(current_line))
+            current_line = [word]
+
+        if (len(lines) + 1) * font.get_height() > max_height:
+            lines.append("...")
+            return lines
+
+    lines.append(' '.join(current_line))
+
+    return lines
 
 def level_selector(main_menu_callback):
     clock = pygame.time.Clock()
@@ -47,6 +69,7 @@ def level_selector(main_menu_callback):
 
     scroll_x = 0
     max_scroll_x = max(0, (LEVEL_BUTTON_WIDTH + 20) * len(levels) - WIDTH)
+    dragging = False
 
     while True:
         screen.fill(WHITE)
@@ -94,7 +117,7 @@ def level_selector(main_menu_callback):
             elif event.type == pygame.MOUSEMOTION:
                 if dragging:
                     delta_x = event.pos[0] - drag_start_x
-                    scroll_x = start_scroll_x + (delta_x / scrollbar_rect.width) * max_scroll_x
+                    scroll_x = start_scroll_x + (delta_x * max_scroll_x / (scrollbar_rect.width - handle_width))
                     scroll_x = max(0, min(scroll_x, max_scroll_x))
 
         pygame.display.flip()
