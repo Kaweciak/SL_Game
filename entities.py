@@ -43,26 +43,43 @@ class Player:
     def handle_input(self):
         keys = pygame.key.get_pressed()
         if keys[pygame.K_LEFT]:
-            self.rect.x -= 5
-        if keys[pygame.K_RIGHT]:
-            self.rect.x += 5
+            self.velocity.x = -5
+        elif keys[pygame.K_RIGHT]:
+            self.velocity.x = 5
+        else:
+            self.velocity.x = 0
+        
         if keys[pygame.K_UP] and self.on_ground:
             self.velocity.y = -10
 
     def handle_collisions(self, platforms, obstacles):
         self.on_ground = False
+
+        # Vertical movement
         self.rect.y += self.velocity.y
         for platform in platforms:
             if self.rect.colliderect(platform.rect):
-                if self.velocity.y > 0:
+                if self.velocity.y > 0:  # Falling
                     self.rect.bottom = platform.rect.top
                     self.on_ground = True
-                elif self.velocity.y < 0:
+                elif self.velocity.y < 0:  # Jumping up
                     self.rect.top = platform.rect.bottom
                 self.velocity.y = 0
+
+        # Horizontal movement
+        self.rect.x += self.velocity.x
+        for platform in platforms:
+            if self.rect.colliderect(platform.rect):
+                if self.velocity.x > 0:  # Moving right
+                    self.rect.right = platform.rect.left
+                elif self.velocity.x < 0:  # Moving left
+                    self.rect.left = platform.rect.right
+                self.velocity.x = 0
+
         for obstacle in obstacles:
             if self.rect.colliderect(obstacle.rect):
                 self.state = State.DEAD
+
         return self.state
 
     def check_bounds(self):

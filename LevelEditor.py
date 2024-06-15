@@ -39,7 +39,6 @@ class LevelEditor:
         self.is_save_button_hovered = False
         self.is_quit_button_hovered = False
 
-        # Load custom cursors
         self.cursors = {
             'default': pygame.SYSTEM_CURSOR_ARROW,
             'left': pygame.SYSTEM_CURSOR_SIZEWE,

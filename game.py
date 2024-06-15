@@ -1,5 +1,4 @@
 import pygame
-import json
 from entities import *
 
 class Game:
