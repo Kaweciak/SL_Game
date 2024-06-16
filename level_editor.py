@@ -244,7 +244,7 @@ class LevelEditor:
             return
 
         level_dict = self.level.to_dict()
-        levels_dir = 'Levels'
+        levels_dir = 'Levels' if os.path.isdir('Levels') else '_internal/Levels'
         os.makedirs(levels_dir, exist_ok=True)
 
         if self.level.start_point is None:

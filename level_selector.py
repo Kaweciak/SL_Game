@@ -48,7 +48,7 @@ def level_selector(main_menu_callback):
     clock = pygame.time.Clock()
 
     levels = []
-    level_directory = 'levels'
+    level_directory = 'Levels' if os.path.isdir('Levels') else '_internal/Levels'
     for file in os.listdir(level_directory):
         if file.endswith('.json'):
             level_name = os.path.splitext(file)[0]
