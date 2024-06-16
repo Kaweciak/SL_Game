@@ -110,10 +110,10 @@ class FinishPoint:
 
 class StartPoint:
     def __init__(self, x, y):
-        self.rect = pygame.Rect(x, y, 10, 10)  # Small rectangle to represent the start point
+        self.rect = pygame.Rect(x, y, 10, 10) 
 
     def render(self, screen):
-        pygame.draw.rect(screen, (0, 0, 0), self.rect)  # Black color for start point
+        pygame.draw.rect(screen, (0, 0, 0), self.rect)
 
 class Level:
     def __init__(self, start_point, finish_points, platforms, obstacles):

@@ -13,7 +13,7 @@ screen = pygame.display.set_mode((WIDTH, HEIGHT), pygame.FULLSCREEN)
 pygame.display.set_caption("Main Menu")
 
 
-def main_menu():
+def main():
     clock = pygame.time.Clock()
     
     play_button = pygame.Rect((WIDTH - BUTTON_WIDTH) // 2, HEIGHT // 3, BUTTON_WIDTH, BUTTON_HEIGHT)
@@ -35,9 +35,9 @@ def main_menu():
                 sys.exit()
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if play_button.collidepoint(event.pos):
-                    level_selector.level_selector(main_menu)
+                    level_selector.level_selector(main)
                 elif editor_button.collidepoint(event.pos):
-                    LevelEditor(main_menu).run()
+                    LevelEditor(main).run()
                 elif quit_button.collidepoint(event.pos):
                     pygame.quit()
                     sys.exit()
@@ -45,4 +45,5 @@ def main_menu():
         pygame.display.flip()
         clock.tick(60)
 
-main_menu()
+if __name__ == "__main__":
+    main()
