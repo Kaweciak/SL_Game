@@ -45,7 +45,7 @@ class Game:
             elif self.game_state == State.DEAD:
                 self.show_message("You died!", ["Try again", "Quit"], self.handle_replay_choice)
             elif self.game_state == State.COMPLETE:
-                self.show_message("Level Complete!", ["Try again", "Quit"], self.handle_replay_choice)
+                self.show_message("Level Complete!", ["Play again", "Quit"], self.handle_replay_choice)
             
             self.clock.tick(60)
 

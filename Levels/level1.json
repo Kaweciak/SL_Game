@@ -1,34 +1,36 @@
 {
-    "finish_point": {
-        "height": 50,
-        "width": 50,
-        "x": 700,
-        "y": 500
-    },
-    "obstacles": [
+    "start_point": [
+        100,
+        100
+    ],
+    "finish_points": [
         {
-            "height": 50,
+            "x": 445,
+            "y": 151,
             "width": 50,
-            "x": 300,
-            "y": 300
+            "height": 50
         }
     ],
     "platforms": [
         {
-            "height": 10,
-            "width": 200,
-            "x": 100,
-            "y": 500
+            "x": 91,
+            "y": 204,
+            "width": 100,
+            "height": 20
         },
         {
-            "height": 10,
-            "width": 200,
-            "x": 400,
-            "y": 400
+            "x": 301,
+            "y": 210,
+            "width": 100,
+            "height": 20
         }
     ],
-    "start_point": [
-        100,
-        100
+    "obstacles": [
+        {
+            "x": 225,
+            "y": 166,
+            "width": 50,
+            "height": 50
+        }
     ]
 }
